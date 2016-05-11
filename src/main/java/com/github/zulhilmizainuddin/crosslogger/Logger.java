@@ -1,27 +1,26 @@
 package com.github.zulhilmizainuddin.crosslogger;
 
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Properties;
 
 public final class Logger {
-    public static void Log(String log) {
+
+    private static final String TAG = "crosslogger";
+
+    public static void log(String log) {
         String javaVersion = System.getProperty("java.version");
 
         if (javaVersion.equals("0")) {
-            LogAndroid(log);
+            logAndroid(log);
         }
         else {
-            LogJVM(log);
+            logJVM(log);
         }
     }
 
-    private static void LogJVM(String log) {
+    private static void logJVM(String log) {
         try {
             Class<?> systemClass = Class.forName("java.lang.System");
             Field outField = systemClass.getDeclaredField("out");
@@ -39,22 +38,16 @@ public final class Logger {
                 InvocationTargetException ex) {}
     }
 
-    private static void LogAndroid(String log) {
+    private static void logAndroid(String log) {
         try {
-            Class<?> logClass = Class.forName("android.util.log");
+            Class<?> logClass = Class.forName("android.util.Log");
             Method infoMethod = logClass.getDeclaredMethod("i", String.class, String.class);
 
-            Properties properties = new Properties();
-            InputStream inputStream = new FileInputStream("config.properties");
-
-            properties.load(inputStream);
-
-            infoMethod.invoke(null, properties.getProperty("tag"), log);
+            infoMethod.invoke(null, TAG, log);
         }
         catch (ClassNotFoundException |
                 NoSuchMethodException |
                 IllegalAccessException |
-                InvocationTargetException |
-                IOException ex) {}
+                InvocationTargetException ex) {}
     }
 }

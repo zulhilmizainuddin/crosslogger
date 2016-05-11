@@ -8,5 +8,3 @@ jdk:
 
 before_install:
   - chmod a+x gradlew
-
-script: ./gradlew jar
